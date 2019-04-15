@@ -4,10 +4,10 @@ points = csvread('scan_fish1.csv');
 [row, col] = size(points);
 
 total_volume = 0;
-piece_volume = 80000; %设定切片体积为40000立方毫米
+piece_volume = 100000; %设定切片体积为40000立方毫米
 err_allowed = piece_volume * 0.05; %单片切片允许误差
 cut_begin = 100;        %定义起刀位置
-cut_angle = pi / 4;     %切刀角度
+% cut_angle = pi / 4;     %切刀角度
 
 x_resolution = 0.3;
 y_resolution = 0.5;
@@ -80,24 +80,24 @@ end
 % figure;
 % mesh(cal_points)
 
-
+min_cost = 10000;           %设定初始的最小代价，大一点
+for cut_angle = pi/6 : pi/180 : pi/4
 %以能够大头方向最凹点为基准，确定第一刀的落刀位置
-for i = 1:row
-    row_length = sum(cal_points(i, :) ~= 0);
-    row_length_1cm = sum(cal_points(i + 20, :) ~= 0);
-    if abs(row_length - row_length_1cm)  < 33.3
-        cut_start = i + 5;
-        cut = generate_cut(cut_start, cut_angle, row, col, y_resolution, z_scale);
-        break;
+    for i = 1:row
+        row_length = sum(cal_points(i, :) ~= 0);
+        row_length_1cm = sum(cal_points(i + 20, :) ~= 0);
+        if abs(row_length - row_length_1cm)  < 33.3
+            cut_start = i + 5;
+            cut = generate_cut(cut_start, cut_angle, row, col, y_resolution, z_scale);
+            break;
+        end
     end
-end
 
 % mesh(cut);
 %   
 
 %% 切第一刀
-min_cost = 10000;           %设定初始的最小代价，大一点
-for cut_angle = pi/6 : pi/180 : pi/3
+
    
     first_cut_volume = cal_volume(cut, cut_start, cal_points, row, col, x_resolution, y_resolution, z_scale);
 %     disp(['第一刀废料体积为：' num2str(fil_total_volume-first_cut_volume-tail_volume) '立方毫米']);
